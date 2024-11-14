@@ -1,2 +1,2 @@
-- [ ] integrate with vue
+- [x] integrate with vue
     - https://www.electronforge.io/guides/framework-integration/vue-3 
