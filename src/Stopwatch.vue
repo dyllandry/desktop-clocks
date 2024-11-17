@@ -4,13 +4,12 @@ is<template>
   <div v-if="!isDurationEditorOpen">{{ formattedStopwatchDuration }}</div>
 
   <div v-if="isDurationEditorOpen">
-    <input v-model="userInputEditedDuration" type="text" name="" id="">
+    <input v-model="userInputEditedDuration" type="text" ref="duration-editor" @keyup.enter="saveEditedDuration">
   </div>
 
   <template v-if="!isDurationEditorOpen">
     <button v-if="!isRunning" @click="handleStartStopwatchPress">Start</button>
     <button v-if="isRunning" @click="stopStopwatch">Stop</button>
-    <button @click="resetStopwatch">Reset</button>
     <button v-if="!isDurationEditorOpen" @click="openDurationEditor">Edit</button>
   </template>
 
@@ -19,12 +18,12 @@ is<template>
     <button @click="closeDurationEditor">Cancel</button>
   </template>
 
-  <div v-if="shownError" style="color: red;">{{shownError}}</div>
+  <div v-if="shownError" style="color: red;">{{ shownError }}</div>
 
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref, useTemplateRef } from 'vue';
 
 const shownError = ref<string | null>(null);
 
@@ -63,12 +62,25 @@ const resetStopwatch = () => {
 
 const isDurationEditorOpen = ref(false);
 const userInputEditedDuration = ref<null | string>(null);
-const openDurationEditor = () => {
+const durationEditor = useTemplateRef<HTMLInputElement>('duration-editor');
+const openDurationEditor = async () => {
   if (isRunning.value) {
     stopStopwatch();
   }
   isDurationEditorOpen.value = true
   userInputEditedDuration.value = formattedStopwatchDuration.value;
+
+  // The nextTick() here is needed for focus to work. I'm not sure why.
+  // This SO question has a comment that may help:
+  // https://stackoverflow.com/q/56093602/7933478
+  // The comment says calling ref.value.focus() directly manipulates the DOM,
+  // and that the element may not be ready to receive focus immediately after
+  // setting it to appear. When we mutate state in openDurationEditor() to show
+  // the duration editor, we are already asking Vue to update the DOM. We should
+  // wait for Vue to finish that first update before trying to focus the
+  // element.
+  await nextTick();
+  durationEditor.value?.focus();
 }
 const saveEditedDuration = () => {
   if (!userInputEditedDuration.value?.match(/\d\d:\d\d:\d\d/)) {
