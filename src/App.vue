@@ -10,3 +10,9 @@
 import Stopwatch from './Stopwatch.vue';
 </script>
 
+<style>
+body {
+  background: black;
+  color: white;
+}
+</style>
