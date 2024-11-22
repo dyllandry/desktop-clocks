@@ -1,20 +1,16 @@
-is<template>
-  <div>Stopwatch</div>
+<template>
+  <div v-if="!isDurationEditorOpen" class="stopwatch-duration">{{ formattedStopwatchDuration }}</div>
 
-  <div v-if="!isDurationEditorOpen">{{ formattedStopwatchDuration }}</div>
-
-  <div v-if="isDurationEditorOpen">
-    <input v-model="userInputEditedDuration" type="text" ref="duration-editor" @keyup.enter="saveEditedDuration">
-  </div>
+  <input v-if="isDurationEditorOpen" v-model="userInputEditedDuration" type="text" ref="duration-editor" @keyup.enter="saveEditedDuration" class="stopwatch-duration" style="display: block;">
 
   <template v-if="!isDurationEditorOpen">
     <button v-if="!isRunning" @click="handleStartStopwatchPress">Start</button>
     <button v-if="isRunning" @click="stopStopwatch">Stop</button>
-    <button v-if="!isDurationEditorOpen" @click="openDurationEditor">Edit</button>
+    <button v-if="!isDurationEditorOpen" @click="openDurationEditor" style="margin-left: 8px;">Edit</button>
   </template>
 
   <template v-if="isDurationEditorOpen">
-    <button @click="saveEditedDuration">Save</button>
+    <button @click="saveEditedDuration" style="margin-right: 8px;">Save</button>
     <button @click="closeDurationEditor">Cancel</button>
   </template>
 
@@ -128,3 +124,8 @@ const formattedStopwatchDuration = computed(() => {
   return `${paddedHours}:${paddedMinutes}:${paddedSeconds}`;
 });
 </script>
+<style>
+.stopwatch-duration {
+  font-size: 20px;
+}
+</style>
