@@ -1,20 +1,24 @@
 <template>
-  <div v-if="!isDurationEditorOpen" class="stopwatch-duration">{{ formattedStopwatchDuration }}</div>
+  <div style="margin: 8px;">
+    <div v-if="!isDurationEditorOpen" style="font-size: 20px;">{{ formattedStopwatchDuration }}</div>
 
-  <input v-if="isDurationEditorOpen" v-model="userInputEditedDuration" type="text" ref="duration-editor" @keyup.enter="saveEditedDuration" class="stopwatch-duration" style="display: block;">
+    <input v-if="isDurationEditorOpen" v-model="userInputEditedDuration" type="text" ref="duration-editor"
+      @keyup.enter="saveEditedDuration" style="display: block; width: 75px; font-size: 16px;">
 
-  <template v-if="!isDurationEditorOpen">
-    <button v-if="!isRunning" @click="handleStartStopwatchPress">Start</button>
-    <button v-if="isRunning" @click="stopStopwatch">Stop</button>
-    <button v-if="!isDurationEditorOpen" @click="openDurationEditor" style="margin-left: 8px;">Edit</button>
-  </template>
+    <div v-if="!isDurationEditorOpen">
+      <button v-if="!isRunning" @click="handleStartStopwatchPress">Start</button>
+      <button v-if="isRunning" @click="stopStopwatch">Stop</button>
+      <button v-if="!isDurationEditorOpen" @click="openDurationEditor" style="margin-left: 8px;">Edit</button>
+    </div>
 
-  <template v-if="isDurationEditorOpen">
-    <button @click="saveEditedDuration" style="margin-right: 8px;">Save</button>
-    <button @click="closeDurationEditor">Cancel</button>
-  </template>
+    <div v-if="isDurationEditorOpen" style="overflow-x: hidden; white-space: nowrap">
+      <button @click="saveEditedDuration" style="margin-right: 8px;">Save</button>
+      <button @click="closeDurationEditor">Back</button>
+    </div>
 
-  <div v-if="shownError" style="color: red;">{{ shownError }}</div>
+    <div v-if="shownError" style="color: red;">{{ shownError }}</div>
+
+  </div>
 
 </template>
 
@@ -125,7 +129,4 @@ const formattedStopwatchDuration = computed(() => {
 });
 </script>
 <style>
-.stopwatch-duration {
-  font-size: 20px;
-}
 </style>

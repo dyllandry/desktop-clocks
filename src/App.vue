@@ -1,4 +1,5 @@
 <template>
+  <div class="draggable-top-bar"></div>
   <Stopwatch/>
 </template>
 
@@ -14,5 +15,18 @@ import Stopwatch from './Stopwatch.vue';
 body {
   background: black;
   color: white;
+  margin: 0px;
+  overflow: hidden;
+}
+
+.draggable-top-bar {
+  height: 12px;
+  width: 100%;
+  top:0;
+  left: 0;
+  position: fixed;
+  app-region: drag;
+  /* Not working, I don't know why.   */
+  cursor: grab;
 }
 </style>
