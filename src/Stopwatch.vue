@@ -1,29 +1,66 @@
 <template>
-  <div style="margin: 8px;">
-    <div v-if="!isDurationEditorOpen" style="font-size: 20px;">{{ formattedStopwatchDuration }}</div>
-
-    <input v-if="isDurationEditorOpen" v-model="userInputEditedDuration" type="text" ref="duration-editor"
-      @keyup.enter="saveEditedDuration" style="display: block; width: 75px; font-size: 16px;">
+  <div>
+    <div style="margin-bottom: 4px">
+      <template v-if="!isDurationEditorOpen">
+        <div style="font-size: 20px">
+          {{ formattedStopwatchDuration }}
+        </div>
+        <div style="font-size: 20px">
+          {{ stopwatchName }}
+        </div>
+      </template>
+      <template v-if="isDurationEditorOpen">
+        <input
+          v-model="userInputEditedDuration"
+          type="text"
+          ref="duration-editor"
+          @keyup.enter="saveEditedDuration"
+          style="display: block; width: 75px; font-size: 16px"
+        />
+        <input
+          placeholder="Name"
+          v-model="stopwatchName"
+          type="text"
+          style="
+            display: block;
+            width: 75px;
+            font-size: 16px;
+            margin-bottom: 4px;
+          "
+        />
+      </template>
+    </div>
 
     <div v-if="!isDurationEditorOpen">
-      <button v-if="!isRunning" @click="handleStartStopwatchPress">Start</button>
-      <button v-if="isRunning" @click="stopStopwatch">Stop</button>
-      <button v-if="!isDurationEditorOpen" @click="openDurationEditor" style="margin-left: 8px;">Edit</button>
+      <button v-if="!isRunning" @click="handleStartStopwatchPress">
+        Start
+      </button>
+      <button v-if="isRunning" @click="stopStopwatch">Pause</button>
+      <button
+        v-if="!isDurationEditorOpen"
+        @click="openDurationEditor"
+        style="margin-left: 8px"
+      >
+        Edit
+      </button>
     </div>
 
-    <div v-if="isDurationEditorOpen" style="overflow-x: hidden; white-space: nowrap">
-      <button @click="saveEditedDuration" style="margin-right: 8px;">Save</button>
-      <button @click="closeDurationEditor">Back</button>
+    <div
+      v-if="isDurationEditorOpen"
+      style="overflow-x: hidden; white-space: nowrap"
+    >
+      <button @click="saveEditedDuration" style="margin-right: 8px">
+        Save
+      </button>
+      <button @click="closeDurationEditor">Cancel</button>
     </div>
 
-    <div v-if="shownError" style="color: red;">{{ shownError }}</div>
-
+    <div v-if="shownError" style="color: red">{{ shownError }}</div>
   </div>
-
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, useTemplateRef } from 'vue';
+import { computed, nextTick, ref, useTemplateRef } from "vue";
 
 const shownError = ref<string | null>(null);
 
@@ -32,13 +69,13 @@ const shownError = ref<string | null>(null);
 const now = ref(Date.now());
 const updateNowValue = () => {
   now.value = Date.now();
-}
+};
 let updateNowValueInterval: NodeJS.Timeout | null = null;
 
 type Session = {
   startTime: number;
   stopTime: number | null;
-}
+};
 const sessions = ref<Session[]>([]);
 
 const startStopwatch = (startTime?: number) => {
@@ -60,14 +97,16 @@ const resetStopwatch = () => {
   sessions.value = [];
 };
 
+const stopwatchName = ref<null | string>(null);
+
 const isDurationEditorOpen = ref(false);
 const userInputEditedDuration = ref<null | string>(null);
-const durationEditor = useTemplateRef<HTMLInputElement>('duration-editor');
+const durationEditor = useTemplateRef<HTMLInputElement>("duration-editor");
 const openDurationEditor = async () => {
   if (isRunning.value) {
     stopStopwatch();
   }
-  isDurationEditorOpen.value = true
+  isDurationEditorOpen.value = true;
   userInputEditedDuration.value = formattedStopwatchDuration.value;
 
   // The nextTick() here is needed for focus to work. I'm not sure why.
@@ -81,13 +120,15 @@ const openDurationEditor = async () => {
   // element.
   await nextTick();
   durationEditor.value?.focus();
-}
+};
 const saveEditedDuration = () => {
   if (!userInputEditedDuration.value?.match(/\d\d:\d\d:\d\d/)) {
     shownError.value = `Invalid duration of ${userInputEditedDuration.value}. Please use the format 00:00:00.`;
     return;
   }
-  const [hours, minutes, seconds] = userInputEditedDuration.value.split(":").map(s => parseInt(s));
+  const [hours, minutes, seconds] = userInputEditedDuration.value
+    .split(":")
+    .map((s) => parseInt(s));
   const hoursMs = hours * 60 * 60 * 1000;
   const minutesMs = minutes * 60 * 1000;
   const secondsMs = seconds * 1000;
@@ -103,7 +144,7 @@ const closeDurationEditor = () => {
   if (shownError.value) {
     shownError.value = null;
   }
-}
+};
 
 const isRunning = computed<boolean>(() => {
   const latestSession = sessions.value[sessions.value.length - 1];
@@ -115,18 +156,19 @@ const formattedStopwatchDuration = computed(() => {
     (totalDuration, { startTime, stopTime }) => {
       const sessionDuration = (stopTime || now.value) - startTime;
       return totalDuration + sessionDuration;
-    }, 0);
+    },
+    0
+  );
 
   const seconds = Math.floor((totalDuration / 1000) % 60).toString();
   const minutes = Math.floor((totalDuration / 1000 / 60) % 60).toString();
-  const hours = Math.floor((totalDuration / 1000 / 60 / 60)).toString();
+  const hours = Math.floor(totalDuration / 1000 / 60 / 60).toString();
 
-  const paddedSeconds = (seconds.length == 1 ? '0' : '') + seconds;
-  const paddedMinutes = (minutes.length == 1 ? '0' : '') + minutes;
-  const paddedHours = (hours.length == 1 ? '0' : '') + hours;
+  const paddedSeconds = (seconds.length == 1 ? "0" : "") + seconds;
+  const paddedMinutes = (minutes.length == 1 ? "0" : "") + minutes;
+  const paddedHours = (hours.length == 1 ? "0" : "") + hours;
 
   return `${paddedHours}:${paddedMinutes}:${paddedSeconds}`;
 });
 </script>
-<style>
-</style>
+<style></style>
